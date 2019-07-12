@@ -14,18 +14,9 @@ int main(int argc, char const *argv[])
         }
         else
         {
-            if (strcmp(argv[i], "-search") == 0)
-            {
-                //do
-            }
-            else
-            {
-                printf("unknown command: %s\n", argv[i]);
-                return 0;
-            }
-            
-        }
-        
+            printf("unknown command: %s\n", argv[i]);
+            return 0; 
+        }     
         printf("arg #%d: %s\n", i, argv[i]);
     }
 
