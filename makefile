@@ -8,9 +8,9 @@ SOURCE_DIR = ./source/
 
 all: cli daemon
 cli:
-	$(CC) $(CFLAGS) -o $(BUILD_DIR)cli $(SOURCE_DIR)cli.c $(SOURCE_DIR)ui.c $(SOURCE_DIR)stat.c
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)cli $(SOURCE_DIR)cli.c $(SOURCE_DIR)ui.c 
 daemon:
-	$(CC) $(CFLAGS) -o $(BUILD_DIR)sniffd $(SOURCE_DIR)daemon.c
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)sniffd $(SOURCE_DIR)daemon.c $(SOURCE_DIR)stat.c
 
 clean :
 	rm -rf $(BUILD_DIR)*

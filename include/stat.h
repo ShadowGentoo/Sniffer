@@ -13,4 +13,6 @@ struct interfaceStat {
     uint32_t ipCount;
 };
 
+int searchByIP(const struct interfaceStat * iStat, const uint32_t ipAdress, int * position);
+
 #endif

@@ -13,12 +13,27 @@
 /* max size 65535, but ethernet usually use MTU =1500 */
 #define BufferSize 1500
 
+void addToStat(struct interfaceStat * ifStat, uint32_t address)
+{
+	int pos = 0;
+	if(searchByIP(ifStat, address, &pos) != -1)
+	{
+		ifStat->statistics[pos].count++;
+	}
+	else
+	{
+		//insert new record
+	}
+	
+}
+
 void parsePacket(unsigned char * packet)
 {
 	struct iphdr * header = (struct iphdr*) (packet + sizeof(struct ethhdr));
 	printf("packet from: %d.%d.%d.%d protocol: %d\n", (unsigned char) header->saddr, (unsigned char) (header->saddr >> 8), 
 		(unsigned char) (header->saddr >> 16), (unsigned char) (header->saddr >> 24), (unsigned char) header->protocol);
 	
+
 }
 
 int main(int argc, char const *argv[])
@@ -28,7 +43,18 @@ int main(int argc, char const *argv[])
 	unsigned char *buf;
     ssize_t data;
 	socklen_t length = sizeof(socketAdress);
-	char * ifname = "eno1";
+	char * ifname = NULL;
+
+	if (argc == 2)
+	{
+		ifname = (char *) malloc(strlen(argv[1]));
+		strcpy(ifname, argv[1]);
+	}
+	else
+	{
+		ifname = "eno1";
+	}
+	
 
 	printf("Allocating %d bytes for buffer: ", BufferSize);
 
