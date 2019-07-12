@@ -12,28 +12,24 @@
 
 /* max size 65535, but ethernet usually use MTU =1500 */
 #define BufferSize 1500
+int run = 1;
 
-void addToStat(struct interfaceStat * ifStat, uint32_t address)
+
+void interruptionHandler(int signalNumber)
 {
-	int pos = 0;
-	if(searchByIP(ifStat, address, &pos) != -1)
-	{
-		ifStat->statistics[pos].count++;
-	}
-	else
-	{
-		//insert new record
-	}
-	
+	printf("Get signal #%d\n", signalNumber);
+	run = 0;
 }
 
-void parsePacket(unsigned char * packet)
+void parsePacket(unsigned char * packet, struct interfaceStat * iStat)
 {
+
 	struct iphdr * header = (struct iphdr*) (packet + sizeof(struct ethhdr));
+
 	printf("packet from: %d.%d.%d.%d protocol: %d\n", (unsigned char) header->saddr, (unsigned char) (header->saddr >> 8), 
 		(unsigned char) (header->saddr >> 16), (unsigned char) (header->saddr >> 24), (unsigned char) header->protocol);
-	
 
+	addToStat(iStat, header->saddr);
 }
 
 int main(int argc, char const *argv[])
@@ -92,24 +88,30 @@ int main(int argc, char const *argv[])
 		printf("[FAIL]\n");
 		return 1;
 	}
-/*
-	signal(SIGTERM, sigcb);
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGUSR1, SIG_IGN);
-	signal(SIGUSR2, SIG_IGN);
-	signal(SIGINT, sigcb);
-	signal(SIGHUP, sigcb);
-*/
 
-	while (1) {
+	signal(SIGTERM, interruptionHandler);
+	signal(SIGINT, interruptionHandler);
+
+	struct interfaceStat iStat;
+	iStat.ipCount = 0;
+	iStat.statistics = NULL;
+
+	char * filename = malloc(strlen(ifname) + 4);
+	strcat(filename, "./");
+	strcat(filename, ifname);
+	readStat(&iStat, ifname);
+
+	while (run) {
 
         data = recvfrom(sniffSocket, buf, BufferSize, 0,&socketAdress, &length);
 		if (data >= 0)
         {
-			parsePacket(buf);
+			parsePacket(buf, &iStat);
         }		
 	}
 
+	writeStat(&iStat, ifname);
+	free(filename);
 	free(buf);
 	shutdown(sniffSocket, SHUT_RDWR);
 	printf("\nFinished.\n");

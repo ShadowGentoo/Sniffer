@@ -14,5 +14,8 @@ struct interfaceStat {
 };
 
 int searchByIP(const struct interfaceStat * iStat, const uint32_t ipAdress, int * position);
+void readStat(struct interfaceStat * iStat, const char * filename);
+void writeStat(struct interfaceStat * iStat, const char * filename);
+void addToStat(struct interfaceStat * ifStat, uint32_t address);
 
 #endif
