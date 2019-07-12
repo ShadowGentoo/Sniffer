@@ -4,14 +4,22 @@
 #include "sys/signal.h"
 #include "linux/if_packet.h"
 #include "net/ethernet.h"
-#include "errno.h"
-#include "time.h"
 #include "netinet/ip.h"
 #include "stdlib.h"
 #include "string.h"
 #include "inttypes.h"
+#include "../include/stat.h"
 
-#define BufferSize 64000
+/* max size 65535, but ethernet usually use MTU =1500 */
+#define BufferSize 1500
+
+void parsePacket(unsigned char * packet)
+{
+	struct iphdr * header = (struct iphdr*) (packet + sizeof(struct ethhdr));
+	printf("packet from: %d.%d.%d.%d protocol: %d\n", (unsigned char) header->saddr, (unsigned char) (header->saddr >> 8), 
+		(unsigned char) (header->saddr >> 16), (unsigned char) (header->saddr >> 24), (unsigned char) header->protocol);
+	
+}
 
 int main(int argc, char const *argv[])
 {
@@ -72,8 +80,7 @@ int main(int argc, char const *argv[])
         data = recvfrom(sniffSocket, buf, BufferSize, 0,&socketAdress, &length);
 		if (data >= 0)
         {
-                struct iphdr * header = (struct iphdr*) (buf + sizeof(struct ethhdr));
-                printf("packet from: %d.%d.%d.%d protocol: %d\n", (unsigned char) header->saddr, (unsigned char) (header->saddr >> 8), (unsigned char) (header->saddr >> 16), (unsigned char) (header->saddr >> 24), (unsigned char) header->protocol);
+			parsePacket(buf);
         }		
 	}
 
