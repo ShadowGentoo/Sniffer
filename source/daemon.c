@@ -9,6 +9,7 @@
 #include "string.h"
 #include "inttypes.h"
 #include "../include/stat.h"
+#include "sys/ioctl.h"
 
 /* max size 65535, but ethernet usually use MTU =1500 */
 #define BufferSize 1500
@@ -68,6 +69,7 @@ int main(int argc, char const *argv[])
 
 	printf("Openning socket: ");
     sniffSocket = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
     if (sniffSocket == -1)
     {
         printf("[FAIL]\n");
@@ -103,7 +105,7 @@ int main(int argc, char const *argv[])
 
 	while (run) {
 
-        data = recvfrom(sniffSocket, buf, BufferSize, 0,&socketAdress, &length);
+        data = recvfrom(sniffSocket, buf, BufferSize, MSG_DONTWAIT,&socketAdress, &length);
 		if (data >= 0)
         {
 			parsePacket(buf, &iStat);
