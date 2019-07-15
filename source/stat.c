@@ -6,19 +6,29 @@
 void readStat(struct interfaceStat * iStat, const char * filename)
 {
     FILE * statFile = fopen(filename, "r");
+    int result = 0;
 
     if (statFile != NULL)
     {
-        fread(&(iStat->ipCount), sizeof(iStat->ipCount), 1, statFile);
+        result = fread(&(iStat->ipCount), sizeof(iStat->ipCount), 1, statFile);
+        if (result != 1)
+        {
+            printf("Readings error!\n");
+        }
         int freeMemory = 10 - (iStat->ipCount % 10);
         iStat->statistics = malloc(sizeof(struct ipStat) * (iStat->ipCount + freeMemory));
-        fread(iStat->statistics, sizeof(struct ipStat), iStat->ipCount, statFile);
+        
+        result = fread(iStat->statistics, sizeof(struct ipStat), iStat->ipCount, statFile);
+        if (result != iStat->ipCount)
+        {
+            printf("Readings error!\n");
+        }
 
         fclose(statFile);
     }
     else
     {
-        printf("Failed to open file %s for reading", filename);
+        printf("Failed to open file %s for reading\n", filename);
     }
     
 }
@@ -36,7 +46,7 @@ void writeStat(struct interfaceStat * iStat, const char * filename)
     }
     else
     {
-        printf("Failed to open file %s for writing", filename);
+        printf("Failed to open file %s for writing\n", filename);
     }
 }
 
